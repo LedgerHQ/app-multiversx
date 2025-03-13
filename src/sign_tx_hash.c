@@ -132,7 +132,13 @@ static void review_final_callback(bool confirmed) {
         send_response(tx, true, false);
         nbgl_useCaseStatus("TRANSACTION\nSIGNED", true, ui_idle);
     } else {
-        nbgl_reject_transaction_choice();
+        if (should_display_blind_signing_flow){
+            send_response(0, false, false);
+            nbgl_useCaseStatus("Transaction\nrejected", false, ui_idle);
+        } else {
+            nbgl_reject_transaction_choice();
+        
+        }
     }
 }
 

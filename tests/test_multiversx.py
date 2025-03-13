@@ -14,6 +14,8 @@ Please refer to the usage file for all available options
 
 from contextlib import contextmanager
 from typing import List, Generator, Dict
+from ragger.backend import BackendInterface
+from ragger.error import ExceptionRAPDU
 from requests import exceptions
 
 import base64
@@ -25,7 +27,7 @@ import sys
 from enum import IntEnum
 from pathlib import Path
 
-from ragger.navigator import NavInsID, NavIns
+from ragger.navigator import NavInsID, NavIns, Navigator
 from ragger.backend.interface import RAPDU, RaisePolicy
 from .utils import get_version_from_makefile
 
@@ -81,7 +83,7 @@ class Error(IntEnum):
 
 def get_screen_coordinates(device, button):
     if button == "reject":
-        return (80, 625) if device == "stax" else (90, 550)
+        return (68, 620) if device == "stax" else (90, 550)
     elif button == "enable_contract_data":
         return (350, 115) if device == "stax" else (415, 140)
     elif button == "qr_code":
@@ -419,6 +421,30 @@ class TestSignTxHash:
                            NavIns(NavInsID.TOUCH, (44, 40)),
                            NavInsID.USE_CASE_REVIEW_CONFIRM]
                 navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
+
+    def test_blind_sign_tx_valid_simple_data_rejected(self, backend: BackendInterface, navigator: Navigator, test_name: str):
+        # TODO: use actual data value that makes sense
+        payload = b'{"nonce":1234,"value":"5678","receiver":"efgh","sender":"abcd","gasPrice":50000,"gasLimit":20,"chainID":"T","version":2,"options":1,"data":"test"}'
+        try:
+            with send_async_sign_message(backend, Ins.SIGN_TX_HASH, payload):
+                if backend.firmware.device.startswith("nano"):
+                    navigator.navigate_until_text_and_compare(NavInsID.RIGHT_CLICK,
+                                                              [NavInsID.BOTH_CLICK],
+                                                              "Sign transaction",
+                                                              ROOT_SCREENSHOT_PATH,
+                                                              test_name)
+                elif backend.firmware.device in ["stax", "flex"]:
+                    nav_ins = [NavInsID.USE_CASE_CHOICE_REJECT,
+                               NavInsID.SWIPE_CENTER_TO_LEFT,
+                               NavInsID.SWIPE_CENTER_TO_LEFT,
+                               *([NavInsID.SWIPE_CENTER_TO_LEFT] if backend.firmware.device == "flex" else []),
+                               NavInsID.USE_CASE_REVIEW_REJECT,
+                               NavInsID.USE_CASE_CHOICE_CONFIRM]
+                    navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
+        except ExceptionRAPDU as e:
+            assert e.status == Error.USER_DENIED
+        else:
+            pytest.fail("Expected transaction rejection")
 
     def test_sign_tx_valid_simple_data_confirmed(self, backend, navigator, test_name):
         # TODO: use actual data value that makes sense
