@@ -46,8 +46,6 @@ static void settings_controls_callback(int token, uint8_t index, int action) {
             } else {
                 new_setting = BLIND_SIGNING_ENABLED;
             }
-            // new_setting = (G_switches[BLIND_SIGNING_IDX].initState == OFF_STATE ?
-            // BLIND_SIGNING_DISABLED : BLIND_SIGNING_ENABLED)
             nvm_write((void*) &N_storage.setting_blind_signing, &new_setting, 1);
             break;
         default:
