@@ -261,7 +261,6 @@ static void ui_sign_tx_hash_nbgl(void) {
                                        review_final_callback);
     } else {
         /*
-        // prepared code for migrating towards using nbgl_useCaseReview - similiar with nbgl_useCaseReviewBlindSigning
         make_content_list();
         nbgl_useCaseReview(TYPE_TRANSACTION,
                            &content,

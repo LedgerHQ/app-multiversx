@@ -79,7 +79,7 @@ void handle_apdu(volatile unsigned int *flags, volatile unsigned int *tx) {
                     G_io_apdu_buffer[0] = (N_storage.setting_contract_data ? 0x01 : 0x00);
                     G_io_apdu_buffer[1] = (N_storage.setting_blind_signing ? 0x01 : 0x00);
                     // G_io_apdu_buffer[1] and G_io_apdu_buffer[2] are not used for account
-                    // index and address index anymore since now those variables are 32 bit 
+                    // index and address index anymore since now those variables are 32 bit
                     // long, but we still expect 6 bytes transmitted to maintain compatibility
                     // with the web wallet. Account index should be read from bytes 6->9, while
                     // address index should be read from bytes 10->13 (Big Endian)
