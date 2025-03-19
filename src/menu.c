@@ -21,7 +21,7 @@ static nbgl_layoutSwitch_t G_switches[NB_SETTINGS_SWITCHES];
 #define CONTRACT_DATA_IDX 0
 #define BLIND_SIGNING_IDX 1
 
-enum {SWITCH_CONTRACT_DATA_SET_TOKEN = FIRST_USER_TOKEN, SWITCH_BLIND_SIGNING_SET_TOKEN};
+enum { SWITCH_CONTRACT_DATA_SET_TOKEN = FIRST_USER_TOKEN, SWITCH_BLIND_SIGNING_SET_TOKEN };
 
 #define NB_SETTINGS_PAGES 1
 
@@ -46,7 +46,8 @@ static void settings_controls_callback(int token, uint8_t index, int action) {
             } else {
                 new_setting = BLIND_SIGNING_ENABLED;
             }
-            //new_setting = (G_switches[BLIND_SIGNING_IDX].initState == OFF_STATE ? BLIND_SIGNING_DISABLED : BLIND_SIGNING_ENABLED)
+            // new_setting = (G_switches[BLIND_SIGNING_IDX].initState == OFF_STATE ?
+            // BLIND_SIGNING_DISABLED : BLIND_SIGNING_ENABLED)
             nvm_write((void*) &N_storage.setting_blind_signing, &new_setting, 1);
             break;
         default:
