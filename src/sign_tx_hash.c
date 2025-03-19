@@ -132,12 +132,11 @@ static void review_final_callback(bool confirmed) {
         send_response(tx, true, false);
         nbgl_useCaseStatus("TRANSACTION\nSIGNED", true, ui_idle);
     } else {
-        if (should_display_blind_signing_flow){
+        if (should_display_blind_signing_flow) {
             send_response(0, false, false);
             nbgl_useCaseStatus("Transaction\nrejected", false, ui_idle);
         } else {
             nbgl_reject_transaction_choice();
-        
         }
     }
 }
@@ -147,7 +146,7 @@ static void disabled_blind_signing_choice(bool confirm) {
     if (confirm) {
         ui_settings();
     } else {
-        //send_response(0, false, false);
+        // send_response(0, false, false);
         nbgl_useCaseStatus("Transaction\nrejected", false, ui_idle);
     }
 }
@@ -400,40 +399,36 @@ UX_STEP_VALID(ux_sign_tx_hash_flow_23_step,
                   &C_icon_crossmark,
                   "Reject",
               });
-         
+
 //UI for blind signing
 UX_STEP_CB(ux_warning_error_blind_signing_1_step,
-            bnnn_paging,
-            ui_idle(),
-            {
-            "Blind signing disabled",
-            "Enable in Settings",
-            });
+           bnnn_paging,
+           ui_idle(),
+           {
+               "Blind signing disabled",
+               "Enable in Settings",
+           });
 
 UX_STEP_VALID(ux_warning_error_blind_signing_2_step,
-            pb,
-            send_response(0, false, true),
-            {
-                &C_icon_crossmark,
-                "Back",
-            });
+              pb,
+              send_response(0, false, true),
+              {
+                  &C_icon_crossmark,
+                  "Back",
+              });
 
 UX_FLOW(ux_error_blind_signing_disabled_flow,
-    &ux_warning_error_blind_signing_1_step, &ux_warning_error_blind_signing_2_step);
+        &ux_warning_error_blind_signing_1_step,
+        &ux_warning_error_blind_signing_2_step);
 
 UX_STEP_NOCB(ux_warning_blind_signing_ahead_step,
-            pb,
-            {
-                &C_icon_warning,
-                "Blind signing",
-            });
+             pb,
+             {
+                 &C_icon_warning,
+                 "Blind signing",
+             });
 
-UX_STEP_NOCB(ux_warning_accept_blind_signing_step,
-            pb,
-            {
-                &C_icon_warning,
-                "Accept risk and"
-            });
+UX_STEP_NOCB(ux_warning_accept_blind_signing_step, pb, {&C_icon_warning, "Accept risk and"});
 
 static void display_tx_sign_flow() {
     uint8_t step = 0;
@@ -481,7 +476,7 @@ static void display_esdt_flow() {
         esdt_flow[step++] = &ux_transfer_esdt_flow_32_step;
     }
     esdt_flow[step++] = &ux_transfer_esdt_flow_28_step;
-    if (should_display_blind_signing_flow){
+    if (should_display_blind_signing_flow) {
         esdt_flow[step++] = &ux_warning_accept_blind_signing_step;
     }
     esdt_flow[step++] = &ux_transfer_esdt_flow_29_step;
@@ -570,8 +565,7 @@ void handle_sign_tx_hash(uint8_t p1,
 #if defined(TARGET_STAX) || defined(TARGET_FLEX)
     if (should_display_blind_signing_flow && N_storage.setting_blind_signing == 0) {
         disabled_blind_signing_warn();
-    }
-    else {
+    } else {
         ui_sign_tx_hash_nbgl();
     }
 #else

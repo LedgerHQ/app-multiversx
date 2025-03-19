@@ -21,10 +21,7 @@ static nbgl_layoutSwitch_t G_switches[NB_SETTINGS_SWITCHES];
 #define CONTRACT_DATA_IDX 0
 #define BLIND_SIGNING_IDX 1
 
-enum {
-    SWITCH_CONTRACT_DATA_SET_TOKEN = FIRST_USER_TOKEN,
-    SWITCH_BLIND_SIGNING_SET_TOKEN
-};
+enum {SWITCH_CONTRACT_DATA_SET_TOKEN = FIRST_USER_TOKEN, SWITCH_BLIND_SIGNING_SET_TOKEN};
 
 #define NB_SETTINGS_PAGES 1
 
@@ -282,14 +279,13 @@ void ui_idle(void) {
 }
 
 void ui_settings(void) {
-    #if defined(TARGET_STAX) || defined(TARGET_FLEX)
-        ui_menu_main(0);
-    #else
-        // reserve a display stack slot if none yet
-        if (G_ux.stack_count == 0) {
-            ux_stack_push();
-        }
-        ux_flow_init(0, ux_idle_flow, NULL);
-    #endif
+#if defined(TARGET_STAX) || defined(TARGET_FLEX)
+    ui_menu_main(0);
+#else
+    // reserve a display stack slot if none yet
+    if (G_ux.stack_count == 0) {
+        ux_stack_push();
     }
-    
+    ux_flow_init(0, ux_idle_flow, NULL);
+#endif
+}
