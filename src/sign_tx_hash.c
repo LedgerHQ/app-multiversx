@@ -400,7 +400,7 @@ UX_STEP_VALID(ux_sign_tx_hash_flow_23_step,
                   "Reject",
               });
 
-//UI for blind signing
+// UI for blind signing
 UX_STEP_CB(ux_warning_error_blind_signing_1_step,
            bnnn_paging,
            ui_idle(),
@@ -449,7 +449,7 @@ static void display_tx_sign_flow() {
         tx_flow[step++] = &ux_sign_tx_hash_flow_25_step;
     }
     tx_flow[step++] = &ux_sign_tx_hash_flow_21_step;
-    if (should_display_blind_signing_flow){
+    if (should_display_blind_signing_flow) {
         tx_flow[step++] = &ux_warning_accept_blind_signing_step;
     }
     tx_flow[step++] = &ux_sign_tx_hash_flow_22_step;
