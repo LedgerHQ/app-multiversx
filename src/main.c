@@ -77,6 +77,7 @@ void handle_apdu(volatile unsigned int *flags, volatile unsigned int *tx) {
 
                 case INS_GET_APP_CONFIGURATION:
                     G_io_apdu_buffer[0] = (N_storage.setting_contract_data ? 0x01 : 0x00);
+                    G_io_apdu_buffer[1] = (N_storage.setting_blind_signing ? 0x01 : 0x00);
                     // G_io_apdu_buffer[1] and G_io_apdu_buffer[2] are not to be taken into
                     // account anymore since now those variables are 32 bit long, but we
                     // still expect 6 bytes transmitted to maintain compatibility with the
@@ -360,6 +361,7 @@ void nv_app_state_init() {
     if (N_storage.initialized != 0x01) {
         internal_storage_t storage;
         storage.setting_contract_data = DEFAULT_CONTRACT_DATA;
+        storage.setting_blind_signing = DEFAULT_BLIND_SIGNING;
         storage.initialized = 0x01;
         nvm_write((internal_storage_t *) &N_storage, (void *) &storage, sizeof(internal_storage_t));
     }

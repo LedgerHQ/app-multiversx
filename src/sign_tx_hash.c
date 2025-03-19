@@ -142,6 +142,25 @@ static void review_final_callback(bool confirmed) {
     }
 }
 
+static void disabled_blind_signing_choice(bool confirm) {
+    send_response(0, false, false);
+    if (confirm) {
+        ui_settings();
+    } else {
+        //send_response(0, false, false);
+        nbgl_useCaseStatus("Transaction\nrejected", false, ui_idle);
+    }
+}
+
+void disabled_blind_signing_warn(void) {
+    nbgl_useCaseChoice(NULL,
+                       "This transaction cannot be clear-signed",
+                       "Enable blind signing in the settings to sign this transaction.",
+                       "Go to settings",
+                       "Reject transaction",
+                       disabled_blind_signing_choice);
+}
+
 static void update_pair(nbgl_contentTagValue_t *pair, const char *item, const char *value) {
     pair->item = item;
     pair->value = value;
@@ -381,10 +400,47 @@ UX_STEP_VALID(ux_sign_tx_hash_flow_23_step,
                   &C_icon_crossmark,
                   "Reject",
               });
+         
+//UI for blind signing
+UX_STEP_CB(ux_warning_error_blind_signing_1_step,
+            bnnn_paging,
+            ui_idle(),
+            {
+            "Blind signing disabled",
+            "Enable in Settings",
+            });
+
+UX_STEP_VALID(ux_warning_error_blind_signing_2_step,
+            pb,
+            send_response(0, false, true),
+            {
+                &C_icon_crossmark,
+                "Back",
+            });
+
+UX_FLOW(ux_error_blind_signing_disabled_flow,
+    &ux_warning_error_blind_signing_1_step, &ux_warning_error_blind_signing_2_step);
+
+UX_STEP_NOCB(ux_warning_blind_signing_ahead_step,
+            pb,
+            {
+                &C_icon_warning,
+                "Blind signing",
+            });
+
+UX_STEP_NOCB(ux_warning_accept_blind_signing_step,
+            pb,
+            {
+                &C_icon_warning,
+                "Accept risk and"
+            });
 
 static void display_tx_sign_flow() {
     uint8_t step = 0;
 
+    if (should_display_blind_signing_flow) {
+        tx_flow[step++] = &ux_warning_blind_signing_ahead_step;
+    }
     tx_flow[step++] = &ux_sign_tx_hash_flow_17_step;
     tx_flow[step++] = &ux_sign_tx_hash_flow_18_step;
     tx_flow[step++] = &ux_sign_tx_hash_flow_19_step;
@@ -398,6 +454,9 @@ static void display_tx_sign_flow() {
         tx_flow[step++] = &ux_sign_tx_hash_flow_25_step;
     }
     tx_flow[step++] = &ux_sign_tx_hash_flow_21_step;
+    if (should_display_blind_signing_flow){
+        tx_flow[step++] = &ux_warning_accept_blind_signing_step;
+    }
     tx_flow[step++] = &ux_sign_tx_hash_flow_22_step;
     tx_flow[step++] = &ux_sign_tx_hash_flow_23_step;
     tx_flow[step++] = FLOW_END_STEP;
@@ -408,6 +467,9 @@ static void display_tx_sign_flow() {
 static void display_esdt_flow() {
     uint8_t step = 0;
 
+    if (should_display_blind_signing_flow) {
+        tx_flow[step++] = &ux_warning_blind_signing_ahead_step;
+    }
     esdt_flow[step++] = &ux_transfer_esdt_flow_24_step;
     esdt_flow[step++] = &ux_transfer_esdt_flow_25_step;
     esdt_flow[step++] = &ux_transfer_esdt_flow_26_step;
@@ -419,6 +481,9 @@ static void display_esdt_flow() {
         esdt_flow[step++] = &ux_transfer_esdt_flow_32_step;
     }
     esdt_flow[step++] = &ux_transfer_esdt_flow_28_step;
+    if (should_display_blind_signing_flow){
+        esdt_flow[step++] = &ux_warning_accept_blind_signing_step;
+    }
     esdt_flow[step++] = &ux_transfer_esdt_flow_29_step;
     esdt_flow[step++] = &ux_transfer_esdt_flow_30_step;
     esdt_flow[step++] = FLOW_END_STEP;
@@ -503,12 +568,21 @@ void handle_sign_tx_hash(uint8_t p1,
     app_state = APP_STATE_IDLE;
 
 #if defined(TARGET_STAX) || defined(TARGET_FLEX)
-    ui_sign_tx_hash_nbgl();
+    if (should_display_blind_signing_flow && N_storage.setting_blind_signing == 0) {
+        disabled_blind_signing_warn();
+    }
+    else {
+        ui_sign_tx_hash_nbgl();
+    }
 #else
-    if (should_display_esdt_flow) {
-        display_esdt_flow();
+    if (should_display_blind_signing_flow && N_storage.setting_blind_signing == 0) {
+        ux_flow_init(0, ux_error_blind_signing_disabled_flow, NULL);
     } else {
-        display_tx_sign_flow();
+        if (should_display_esdt_flow) {
+            display_esdt_flow();
+        } else {
+            display_tx_sign_flow();
+        }
     }
 #endif
 
