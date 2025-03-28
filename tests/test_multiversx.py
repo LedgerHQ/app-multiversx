@@ -468,7 +468,6 @@ class TestSignTxHash:
                        NavInsID.USE_CASE_SETTINGS_MULTI_PAGE_EXIT]
 
         navigator.navigate(nav_ins, screen_change_before_first_instruction=False)
-        # navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name + "_0", nav_ins, screen_change_before_first_instruction=False)
 
     def test_blind_sign_tx_valid_simple_data_confirmed(self, backend, navigator, test_name):
         # TODO: use actual data value that makes sense
@@ -508,7 +507,6 @@ class TestSignTxHash:
                                NavInsID.USE_CASE_SETTINGS_MULTI_PAGE_EXIT
                                ]
                     navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
-        # assert backend.last_async_response.status == Error.USER_DENIED
         except ExceptionRAPDU as e:
             assert e.status == Error.USER_DENIED
         else:

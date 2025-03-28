@@ -63,7 +63,9 @@ static bool sign_tx_hash(uint8_t *data_buffer) {
 
 static bool is_blind_signing() {
     bool has_data = strlen(tx_context.data) > 0;
-    if (!has_data) return false;
+    if (!has_data) {
+        return false;
+    }
 
     char *ptr = tx_context.data;
 
@@ -112,19 +114,8 @@ static bool is_esdt_transfer() {
 
 #if defined(TARGET_STAX) || defined(TARGET_FLEX)
 
-static nbgl_layoutTagValueList_t layout;
-static nbgl_layoutTagValue_t pairs_list[7];  // 7 info max for ESDT and 7 info max for EGLD
-
 static nbgl_contentTagValueList_t content;
-static nbgl_contentTagValue_t content_pairs_list[7];
-
-static const nbgl_pageInfoLongPress_t review_final_long_press = {
-    .text = "Sign transaction on\n" APPNAME " network?",
-    .icon = &C_icon_multiversx_logo_64x64,
-    .longPressText = "Hold to sign",
-    .longPressToken = 0,
-    .tuneId = TUNE_TAP_CASUAL,
-};
+static nbgl_contentTagValue_t content_pairs_list[7];  // 7 info max for ESDT and 7 info max for EGLD
 
 static void review_final_callback(bool confirmed) {
     if (confirmed) {
@@ -132,12 +123,8 @@ static void review_final_callback(bool confirmed) {
         send_response(tx, true, false);
         nbgl_useCaseStatus("TRANSACTION\nSIGNED", true, ui_idle);
     } else {
-        if (should_display_blind_signing_flow) {
-            send_response(0, false, false);
-            nbgl_useCaseStatus("Transaction\nrejected", false, ui_idle);
-        } else {
-            nbgl_reject_transaction_choice();
-        }
+        send_response(0, false, false);
+        nbgl_useCaseStatus("Transaction\nrejected", false, ui_idle);
     }
 }
 
@@ -146,7 +133,6 @@ static void disabled_blind_signing_choice(bool confirm) {
     if (confirm) {
         ui_settings();
     } else {
-        // send_response(0, false, false);
         nbgl_useCaseStatus("Transaction\nrejected", false, ui_idle);
     }
 }
@@ -165,70 +151,36 @@ static void update_pair(nbgl_contentTagValue_t *pair, const char *item, const ch
     pair->value = value;
 }
 
-static void update_content_pair(nbgl_contentTagValue_t *pair, const char *item, const char *value) {
-    pair->item = item;
-    pair->value = value;
-}
-
-static void start_review(void) {
-    uint8_t step = 0;
-
-    if (should_display_esdt_flow) {
-        update_pair(&pairs_list[step++], "Token", esdt_info.ticker);
-        update_pair(&pairs_list[step++], "Value", tx_context.amount);
-        update_pair(&pairs_list[step++], "Receiver", tx_context.receiver);
-        update_pair(&pairs_list[step++], "Fee", tx_context.fee);
-        if (strlen(tx_context.guardian) > 0) {
-            update_pair(&pairs_list[step++], "Guardian", tx_context.guardian);
-        }
-        if (strlen(tx_context.relayer) > 0) {
-            update_pair(&pairs_list[step++], "Relayer", tx_context.relayer);
-        }
-        update_pair(&pairs_list[step++], "Network", tx_context.network);
-    } else {
-        update_pair(&pairs_list[step++], "Receiver", tx_context.receiver);
-        update_pair(&pairs_list[step++], "Amount", tx_context.amount);
-        update_pair(&pairs_list[step++], "Fee", tx_context.fee);
-        if (tx_context.data_size > 0) {
-            update_pair(&pairs_list[step++], "Data", tx_context.data);
-        }
-        if (strlen(tx_context.guardian) > 0) {
-            update_pair(&pairs_list[step++], "Guardian", tx_context.guardian);
-        }
-        if (strlen(tx_context.relayer) > 0) {
-            update_pair(&pairs_list[step++], "Relayer", tx_context.relayer);
-        }
-        update_pair(&pairs_list[step++], "Network", tx_context.network);
-    }
-
-    layout.nbMaxLinesForValue = 0;
-    layout.smallCaseForValue = false;
-    layout.wrapping = true;
-    layout.pairs = pairs_list;
-    layout.nbPairs = step;
-
-    nbgl_useCaseStaticReview(&layout,
-                             &review_final_long_press,
-                             "Reject transaction",
-                             review_final_callback);
-}
-
 static void make_content_list(void) {
     uint8_t step = 0;
 
-    update_content_pair(&content_pairs_list[step++], "Receiver", tx_context.receiver);
-    update_content_pair(&content_pairs_list[step++], "Amount", tx_context.amount);
-    update_content_pair(&content_pairs_list[step++], "Fee", tx_context.fee);
-    if (tx_context.data_size > 0) {
-        update_content_pair(&content_pairs_list[step++], "Data", tx_context.data);
+    if (should_display_esdt_flow) {
+        update_pair(&content_pairs_list[step++], "Token", esdt_info.ticker);
+        update_pair(&content_pairs_list[step++], "Value", tx_context.amount);
+        update_pair(&content_pairs_list[step++], "Receiver", tx_context.receiver);
+        update_pair(&content_pairs_list[step++], "Fee", tx_context.fee);
+        if (strlen(tx_context.guardian) > 0) {
+            update_pair(&content_pairs_list[step++], "Guardian", tx_context.guardian);
+        }
+        if (strlen(tx_context.relayer) > 0) {
+            update_pair(&content_pairs_list[step++], "Relayer", tx_context.relayer);
+        }
+        update_pair(&content_pairs_list[step++], "Network", tx_context.network);
+    } else {
+        update_pair(&content_pairs_list[step++], "Receiver", tx_context.receiver);
+        update_pair(&content_pairs_list[step++], "Amount", tx_context.amount);
+        update_pair(&content_pairs_list[step++], "Fee", tx_context.fee);
+        if (tx_context.data_size > 0) {
+            update_pair(&content_pairs_list[step++], "Data", tx_context.data);
+        }
+        if (strlen(tx_context.guardian) > 0) {
+            update_pair(&content_pairs_list[step++], "Guardian", tx_context.guardian);
+        }
+        if (strlen(tx_context.relayer) > 0) {
+            update_pair(&content_pairs_list[step++], "Relayer", tx_context.relayer);
+        }
+        update_pair(&content_pairs_list[step++], "Network", tx_context.network);
     }
-    if (strlen(tx_context.guardian) > 0) {
-        update_content_pair(&content_pairs_list[step++], "Guardian", tx_context.guardian);
-    }
-    if (strlen(tx_context.relayer) > 0) {
-        update_content_pair(&content_pairs_list[step++], "Relayer", tx_context.relayer);
-    }
-    update_content_pair(&content_pairs_list[step++], "Network", tx_context.network);
 
     content.pairs = content_pairs_list;
     content.callback = NULL;
@@ -242,15 +194,8 @@ static void make_content_list(void) {
 }
 
 static void ui_sign_tx_hash_nbgl(void) {
-    if (should_display_esdt_flow) {
-        nbgl_useCaseReviewStart(&C_icon_multiversx_logo_64x64,
-                                "Review transaction to\nsend ESDT on\n" APPNAME " network",
-                                "",
-                                "Reject transaction",
-                                start_review,
-                                nbgl_reject_transaction_choice);
-    } else if (should_display_blind_signing_flow) {
-        make_content_list();
+    make_content_list();
+    if (should_display_blind_signing_flow) {
         nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
                                        &content,
                                        &C_icon_multiversx_logo_64x64,
@@ -260,22 +205,15 @@ static void ui_sign_tx_hash_nbgl(void) {
                                        NULL,
                                        review_final_callback);
     } else {
-        /*
-        make_content_list();
         nbgl_useCaseReview(TYPE_TRANSACTION,
-                           &content,
-                           &C_icon_multiversx_logo_64x64,
-                           "Review transaction to\nsend EGLD on\n" APPNAME " network",
-                           "",
-                           "Sign transaction on\n" APPNAME " network?",
-                           review_final_callback);
-        */
-        nbgl_useCaseReviewStart(&C_icon_multiversx_logo_64x64,
-                                "Review transaction to\nsend EGLD on\n" APPNAME " network",
-                                "",
-                                "Reject transaction",
-                                start_review,
-                                nbgl_reject_transaction_choice);
+            &content,
+            &C_icon_multiversx_logo_64x64,
+            should_display_esdt_flow ? 
+            "Review transaction to\nsend ESDT on\n" APPNAME " network" :
+            "Review transaction to\nsend EGLD on\n" APPNAME " network",
+            "",
+            "Sign transaction on\n" APPNAME " network?",
+            review_final_callback);
     }
 }
 
