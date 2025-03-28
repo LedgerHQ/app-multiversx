@@ -206,14 +206,14 @@ static void ui_sign_tx_hash_nbgl(void) {
                                        review_final_callback);
     } else {
         nbgl_useCaseReview(TYPE_TRANSACTION,
-            &content,
-            &C_icon_multiversx_logo_64x64,
-            should_display_esdt_flow ? 
-            "Review transaction to\nsend ESDT on\n" APPNAME " network" :
-            "Review transaction to\nsend EGLD on\n" APPNAME " network",
-            "",
-            "Sign transaction on\n" APPNAME " network?",
-            review_final_callback);
+                           &content,
+                           &C_icon_multiversx_logo_64x64,
+                           should_display_esdt_flow
+                               ? "Review transaction to\nsend ESDT on\n" APPNAME " network"
+                               : "Review transaction to\nsend EGLD on\n" APPNAME " network",
+                           "",
+                           "Sign transaction on\n" APPNAME " network?",
+                           review_final_callback);
     }
 }
 
