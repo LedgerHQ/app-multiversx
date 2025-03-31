@@ -486,6 +486,7 @@ void handle_sign_tx_hash(uint8_t p1,
         THROW(ERR_SIGNATURE_FAILED);
     }
 
+    should_display_blind_signing_flow = false;
     should_display_esdt_flow = false;
     if (is_esdt_transfer()) {
         uint16_t res;
