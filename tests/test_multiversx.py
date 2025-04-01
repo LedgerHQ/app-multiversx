@@ -170,8 +170,7 @@ class TestGetAppConfiguration:
 
     def test_toggle_contract_data(self, backend, navigator, test_name):
         # init enabled
-        assert backend.exchange(
-            CLA, Ins.GET_APP_CONFIGURATION, P1.FIRST, 0, b"").data[0] == 1
+        assert backend.exchange(CLA, Ins.GET_APP_CONFIGURATION, P1.FIRST, 0, b"").data[0] == 1
 
         # switch to disabled
         if backend.firmware.device.startswith("nano"):
@@ -188,8 +187,7 @@ class TestGetAppConfiguration:
 
         navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name + "_0", nav_ins,
                                        screen_change_before_first_instruction=False)
-        assert backend.exchange(
-            CLA, Ins.GET_APP_CONFIGURATION, P1.FIRST, 0, b"").data[0] == 0
+        assert backend.exchange(CLA, Ins.GET_APP_CONFIGURATION, P1.FIRST, 0, b"").data[0] == 0
 
         # switch back to enabled
         if backend.firmware.device.startswith("nano"):
@@ -206,8 +204,7 @@ class TestGetAppConfiguration:
 
         navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name + "_1", nav_ins,
                                        screen_change_before_first_instruction=False)
-        assert backend.exchange(
-            CLA, Ins.GET_APP_CONFIGURATION, P1.FIRST, 0, b"").data[0] == 1
+        assert backend.exchange(CLA, Ins.GET_APP_CONFIGURATION, P1.FIRST, 0, b"").data[0] == 1
 
 
 class TestGetAddr:
@@ -216,8 +213,7 @@ class TestGetAddr:
         account = 1
         index = 1
         payload = account.to_bytes(4, "big") + index.to_bytes(4, "big")
-        data = backend.exchange(
-            CLA, Ins.GET_ADDR, P1.NON_CONFIRM, P2.DISPLAY_HEX, payload).data
+        data = backend.exchange(CLA, Ins.GET_ADDR, P1.NON_CONFIRM, P2.DISPLAY_HEX, payload).data
         assert re.match("^@[0-9a-f]{64}$", data.decode("ascii"))
 
     def test_get_addr_confirm_ok(self, backend, navigator, test_name):
@@ -268,8 +264,7 @@ class TestGetAddr:
     def test_get_addr_too_long(self, backend):
         payload = int(0).to_bytes(4, "big") * 3
         backend.raise_policy = RaisePolicy.RAISE_NOTHING
-        rapdu = backend.exchange(
-            CLA, Ins.GET_ADDR, P1.NON_CONFIRM, P2.DISPLAY_HEX, payload)
+        rapdu = backend.exchange(CLA, Ins.GET_ADDR, P1.NON_CONFIRM, P2.DISPLAY_HEX, payload)
         assert rapdu.status == Error.INVALID_ARGUMENTS
 
 
@@ -573,8 +568,7 @@ class TestSignTxHash:
         to_hash_str = chr(len(token_ticker)) + token_ticker + chr(len(token_identifier)) + token_identifier + chr(
             num_decimals) + chr(len(chain_id)) + chain_id
         payload = bytes(to_hash_str, "utf-8") + signature
-        rapdu = backend.exchange(
-            CLA, Ins.PROVIDE_ESDT_INFO, P1.FIRST, 0, payload)
+        rapdu = backend.exchange(CLA, Ins.PROVIDE_ESDT_INFO, P1.FIRST, 0, payload)
         assert rapdu.status == 0x9000
 
         payload = b'{"nonce":1234,"value":"5678","receiver":"efgh","sender":"abcd","gasPrice":50000,"gasLimit":20,"chainID":"T","version":2,"options":2,'
@@ -611,8 +605,7 @@ class TestSignTxHash:
         to_hash_str = chr(len(token_ticker)) + token_ticker + chr(len(token_identifier)) + token_identifier + chr(
             num_decimals) + chr(len(chain_id)) + chain_id
         payload = bytes(to_hash_str, "utf-8") + signature
-        rapdu = backend.exchange(
-            CLA, Ins.PROVIDE_ESDT_INFO, P1.FIRST, 0, payload)
+        rapdu = backend.exchange(CLA, Ins.PROVIDE_ESDT_INFO, P1.FIRST, 0, payload)
         assert rapdu.status == 0x9000
 
         payload = b'{"nonce":1234,"value":"5678","receiver":"efgh","sender":"abcd","gasPrice":50000,"gasLimit":20,"chainID":"T","guardian":"g","version":2,"options":2,'
