@@ -279,7 +279,7 @@ void ui_idle(void) {
 
 void ui_settings(void) {
 #if defined(TARGET_STAX) || defined(TARGET_FLEX)
-#define BLIND_SIGNING_SWITCH_SETTINGS_PAGE 0
+    const int BLIND_SIGNING_SWITCH_SETTINGS_PAGE = 0;
     ui_menu_main(BLIND_SIGNING_SWITCH_SETTINGS_PAGE);
 #else
     // reserve a display stack slot if none yet
