@@ -49,9 +49,6 @@ DEFINES += JSMN_STRICT=1
 # Default rule #
 ################
 all: default
-#	@echo "BOLOS_SDK=$(BOLOS_SDK)"
-#	@warning "HAVE_BAGL=$(HAVE_BAGL)"
-	@echo "XXXXXX   TARGET_NAME=$(TARGET_NAME)"
 
 ############
 # Platform #
@@ -136,7 +133,6 @@ endif
 
 CC       := $(CLANGPATH)clang
 
-#CFLAGS   += -O0
 CFLAGS   += -O3 -Os
 
 AS     := $(GCCPATH)arm-none-eabi-gcc
