@@ -37,18 +37,10 @@ APP_SOURCE_PATH  += src
 APP_SOURCE_PATH  += deps/ledger-zxlib/include deps/ledger-zxlib/src deps/uint256
 
 # App icon
-ifeq ($(TARGET_NAME),TARGET_NANOS)
-    ICONNAME = icons/nanos_app_multiversx.gif
-else ifeq ($(TARGET_NAME),TARGET_STAX)
-    ICONNAME = icons/stax_app_multiversx.gif
-else ifeq ($(TARGET_NAME),TARGET_FLEX)
-    ICONNAME = icons/flex_app_multiversx.gif
-else
-    ICONNAME = icons/nanox_app_multiversx.gif
-endif
-
-DEFINES += JSMN_STRICT=1
-
+ICON_NANOS = icons/nanos_app_multiversx.gif
+ICON_STAX = icons/stax_app_multiversx.gif
+ICON_FLEX = icons/flex_app_multiversx.gif
+ICON_NANOX = icons/nanox_app_multiversx.gif
 
 ########################################
 # App communication interfaces         #
@@ -68,7 +60,8 @@ all: default
 ############
 # Platform #
 ############
-DEFINES   += HAVE_SPRINTF
+DEFINES += HAVE_SPRINTF
+DEFINES += JSMN_STRICT=1
 
 # U2F
 SDK_SOURCE_PATH += lib_u2f
