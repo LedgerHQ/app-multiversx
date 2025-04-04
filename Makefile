@@ -41,7 +41,7 @@ ICON_NANOS = icons/nanos_app_multiversx.gif
 ICON_STAX = icons/stax_app_multiversx.gif
 ICON_FLEX = icons/flex_app_multiversx.gif
 ICON_NANOX = icons/nanox_app_multiversx.gif
-ICON_NANOSP = icons/nanox_app_multiversx.gif
+ICON_NANOSP = icons/nanosp_app_multiversx.gif
 
 ########################################
 # App communication interfaces         #
