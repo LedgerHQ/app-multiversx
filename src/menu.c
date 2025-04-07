@@ -206,7 +206,6 @@ static void setting_contract_data_selector(unsigned int idx) {
 }
 
 static void setting_blind_signing_selector(unsigned int idx) {
-    PRINTF("Blind signing selector called with idx: %u\n", idx);
     switch (idx) {
         case BLIND_SIGNING_DISABLED:
             setting_blind_signing_change(BLIND_SIGNING_DISABLED);

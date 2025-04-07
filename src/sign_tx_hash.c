@@ -61,23 +61,6 @@ static bool sign_tx_hash(uint8_t *data_buffer) {
     return success;
 }
 
-static bool is_blind_signing() {
-    bool has_data = strlen(tx_context.data) > 0;
-    if (!has_data) {
-        return false;
-    }
-
-    char *ptr = tx_context.data;
-
-    while (*ptr) {
-        if (!isalnum((unsigned char) *ptr) && !strchr("@[]: ", *ptr)) {
-            return true;  // Found an invalid character - blind signing
-        }
-        ptr++;
-    }
-    return false;  // All characters are either alphanumeric or '@' - not blind signing
-}
-
 static bool is_esdt_transfer() {
     bool identifier_len_valid = esdt_info.identifier_len > 0;
     bool has_data = strlen(tx_context.data) > 0;
@@ -470,10 +453,13 @@ void handle_sign_tx_hash(uint8_t p1,
         THROW(err);
     }
 
+    should_display_blind_signing_flow = false;
     uint16_t parse_err = parse_data(data_buffer, data_length);
-    if (parse_err != MSG_OK) {
+    if (parse_err != MSG_OK && parse_err != MSG_BLIND_SIGNING) {
         init_tx_context();
         THROW(parse_err);
+    } else if (parse_err == MSG_BLIND_SIGNING) {
+        should_display_blind_signing_flow = true;
     }
 
     if (tx_hash_context.status != JSON_IDLE) {
@@ -486,7 +472,6 @@ void handle_sign_tx_hash(uint8_t p1,
         THROW(ERR_SIGNATURE_FAILED);
     }
 
-    should_display_blind_signing_flow = false;
     should_display_esdt_flow = false;
     if (is_esdt_transfer()) {
         uint16_t res;
@@ -495,8 +480,6 @@ void handle_sign_tx_hash(uint8_t p1,
             THROW(res);
         }
         should_display_esdt_flow = true;
-    } else if (is_blind_signing()) {
-        should_display_blind_signing_flow = true;
     }
 
     app_state = APP_STATE_IDLE;
