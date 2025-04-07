@@ -480,6 +480,7 @@ void handle_sign_tx_hash(uint8_t p1,
             THROW(res);
         }
         should_display_esdt_flow = true;
+        should_display_blind_signing_flow = false;
     }
 
     app_state = APP_STATE_IDLE;
