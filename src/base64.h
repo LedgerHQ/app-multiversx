@@ -14,7 +14,7 @@ typedef struct {
     bool is_nonBase64;
     bool has_nonPrintableChars;
 } base64decode_result_t;
- 
+
 static bool isBase64Char(char c);
 static char base64decode_byte(char c);
 static base64decode_result_t base64decode(char *decoded, const char *source, size_t len);
@@ -69,7 +69,7 @@ static base64decode_result_t base64decode(char *decoded, const char *source, siz
     result.is_nonBase64 = false;
     // replace non-printable characters with '?'
     for (size_t i = 0; i < len / 4 * 3; i++) {
-        if ((decoded[i] >0 && decoded[i] < 32) || decoded[i] > 126) {
+        if ((decoded[i] > 0 && decoded[i] < 32) || decoded[i] > 126) {
             decoded[i] = '?';
             result.has_nonPrintableChars = true;
         }
