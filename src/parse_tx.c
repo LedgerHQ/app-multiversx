@@ -226,7 +226,7 @@ uint16_t verify_gaslimit(bool *valid) {
 
 // verify "data" field
 uint16_t verify_data(bool *valid) {
-    uint16_t return_message = MSG_OK;
+    uint16_t return_code = MSG_OK;
     if (strncmp(tx_hash_context.current_field, DATA_FIELD, strlen(DATA_FIELD)) == 0) {
 #ifndef FUZZING
         if (N_storage.setting_contract_data == 0) {
@@ -249,20 +249,19 @@ uint16_t verify_data(bool *valid) {
             memmove(encoded + MAX_DISPLAY_DATA_SIZE - ellipsisLen, ellipsis, ellipsisLen);
         }
         base64decode_result_t decode_result = base64decode(tx_context.data, encoded, ascii_len);
-        if (decode_result.is_nonBase64) {
+        if (!decode_result.is_valid) {
             return ERR_INVALID_MESSAGE;
         }
         if (decode_result.has_nonPrintableChars) {
-            return_message = MSG_BLIND_SIGNING;
+            return_code = MSG_BLIND_SIGNING;
         }
         if (strncmp(tx_context.data, ESDT_TRANSFER_PREFIX, ESDT_TRANSFER_PREFIX_LENGTH) == 0) {
             extract_esdt_value(tx_hash_context.current_value, tx_hash_context.current_value_len);
-            return_message = MSG_OK;
         }
         compute_data_size(tx_hash_context.data_field_size);
         *valid = true;
     }
-    return return_message;
+    return return_code;
 }
 
 static void extract_esdt_value(const char *encoded_data_field, const uint8_t encoded_data_length) {
@@ -270,7 +269,7 @@ static void extract_esdt_value(const char *encoded_data_field, const uint8_t enc
         return;
     }
     char data_field[MAX_ESDT_TRANSFER_DATA_SIZE];
-    if (base64decode(data_field, encoded_data_field, encoded_data_length).is_nonBase64) {
+    if (!base64decode(data_field, encoded_data_field, encoded_data_length).is_valid) {
         return;
     }
 
@@ -435,7 +434,7 @@ uint16_t process_field(void) {
     }
     bool valid_field = false;
     uint16_t err;
-    uint16_t return_message = MSG_OK;
+    uint16_t return_code = MSG_OK;
     err = verify_value(&valid_field);
     if (err != MSG_OK) {
         return err;
@@ -456,7 +455,7 @@ uint16_t process_field(void) {
     if (err != MSG_OK && err != MSG_BLIND_SIGNING) {
         return err;
     } else if (err == MSG_BLIND_SIGNING) {
-        return_message = MSG_BLIND_SIGNING;
+        return_code = MSG_BLIND_SIGNING;
     }
     err = verify_chainid(&valid_field);
     if (err != MSG_OK) {
@@ -490,7 +489,7 @@ uint16_t process_field(void) {
                            strlen(RECEIVER_USERNAME_FIELD)) == 0;
 
     if (valid_field) {
-        return return_message;
+        return return_code;
     } else {
         return ERR_INVALID_MESSAGE;
     }

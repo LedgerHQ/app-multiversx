@@ -460,7 +460,7 @@ void handle_sign_tx_hash(uint8_t p1,
         THROW(parse_err);
     } else if (parse_err == MSG_BLIND_SIGNING) {
         should_display_blind_signing_flow = true;
-    }
+    } 
 
     if (tx_hash_context.status != JSON_IDLE) {
         THROW(MSG_OK);
@@ -480,8 +480,7 @@ void handle_sign_tx_hash(uint8_t p1,
             THROW(res);
         }
         should_display_esdt_flow = true;
-        should_display_blind_signing_flow = false;
-    }
+    } 
 
     app_state = APP_STATE_IDLE;
 

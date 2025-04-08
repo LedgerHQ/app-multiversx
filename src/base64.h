@@ -11,7 +11,7 @@ https://en.wikipedia.org/wiki/Base64
 */
 
 typedef struct {
-    bool is_nonBase64;
+    bool is_valid;
     bool has_nonPrintableChars;
 } base64decode_result_t;
 
@@ -48,14 +48,12 @@ static char base64decode_byte(char c) {
 
 // decode base64 data
 static base64decode_result_t base64decode(char *decoded, const char *source, size_t len) {
-    base64decode_result_t result = {0};
-    result.is_nonBase64 = true;
-    result.has_nonPrintableChars = false;
     for (size_t i = 0; i < len / 4; i++) {
         uint32_t data = 0;
         for (int j = 0; j < 4; j++) {
             char c = source[i * 4 + j];
             if (!isBase64Char(c)) {
+                base64decode_result_t result = { .is_valid = false, .has_nonPrintableChars = false };
                 return result;
             }
             data <<= 6;
@@ -66,10 +64,10 @@ static base64decode_result_t base64decode(char *decoded, const char *source, siz
         decoded[i * 3 + 2] = data & 0xFF;
     }
     decoded[len / 4 * 3] = '\0';
-    result.is_nonBase64 = false;
+    base64decode_result_t result = { .is_valid = true, .has_nonPrintableChars = false };
     // replace non-printable characters with '?'
     for (size_t i = 0; i < len / 4 * 3; i++) {
-        if ((decoded[i] > 0 && decoded[i] < 32) || decoded[i] > 126) {
+        if ((decoded[i] > 0 && decoded[i] < 9) || (decoded[i] > 13 && decoded[i] < 32 ) || decoded[i] > 126) {
             decoded[i] = '?';
             result.has_nonPrintableChars = true;
         }
