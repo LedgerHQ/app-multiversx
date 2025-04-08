@@ -53,7 +53,7 @@ static base64decode_result_t base64decode(char *decoded, const char *source, siz
         for (int j = 0; j < 4; j++) {
             char c = source[i * 4 + j];
             if (!isBase64Char(c)) {
-                base64decode_result_t result = { .is_valid = false, .has_nonPrintableChars = false };
+                base64decode_result_t result = {.is_valid = false, .has_nonPrintableChars = false};
                 return result;
             }
             data <<= 6;
@@ -64,10 +64,11 @@ static base64decode_result_t base64decode(char *decoded, const char *source, siz
         decoded[i * 3 + 2] = data & 0xFF;
     }
     decoded[len / 4 * 3] = '\0';
-    base64decode_result_t result = { .is_valid = true, .has_nonPrintableChars = false };
+    base64decode_result_t result = {.is_valid = true, .has_nonPrintableChars = false};
     // replace non-printable characters with '?'
     for (size_t i = 0; i < len / 4 * 3; i++) {
-        if ((decoded[i] > 0 && decoded[i] < 9) || (decoded[i] > 13 && decoded[i] < 32 ) || decoded[i] > 126) {
+        if ((decoded[i] > 0 && decoded[i] < 9) || (decoded[i] > 13 && decoded[i] < 32) ||
+            decoded[i] > 126) {
             decoded[i] = '?';
             result.has_nonPrintableChars = true;
         }

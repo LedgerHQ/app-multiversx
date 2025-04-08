@@ -455,12 +455,11 @@ void handle_sign_tx_hash(uint8_t p1,
 
     should_display_blind_signing_flow = false;
     uint16_t parse_err = parse_data(data_buffer, data_length);
+    should_display_blind_signing_flow = (parse_err == MSG_BLIND_SIGNING);
     if (parse_err != MSG_OK && parse_err != MSG_BLIND_SIGNING) {
         init_tx_context();
         THROW(parse_err);
-    } else if (parse_err == MSG_BLIND_SIGNING) {
-        should_display_blind_signing_flow = true;
-    } 
+    }
 
     if (tx_hash_context.status != JSON_IDLE) {
         THROW(MSG_OK);
@@ -480,7 +479,7 @@ void handle_sign_tx_hash(uint8_t p1,
             THROW(res);
         }
         should_display_esdt_flow = true;
-    } 
+    }
 
     app_state = APP_STATE_IDLE;
 
