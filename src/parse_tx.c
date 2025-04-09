@@ -12,6 +12,7 @@
 #include "globals.h"
 #endif
 
+bool found_non_printable_chars = false;
 static void extract_esdt_value(const char *encoded_data_field, const uint8_t encoded_data_length);
 static void set_network(const char *chain_id);
 static void set_message_in_amount(const char *message);
@@ -226,7 +227,6 @@ uint16_t verify_gaslimit(bool *valid) {
 
 // verify "data" field
 uint16_t verify_data(bool *valid) {
-    uint16_t return_code = MSG_OK;
     if (strncmp(tx_hash_context.current_field, DATA_FIELD, strlen(DATA_FIELD)) == 0) {
 #ifndef FUZZING
         if (N_storage.setting_contract_data == 0) {
@@ -248,20 +248,19 @@ uint16_t verify_data(bool *valid) {
             int ellipsisLen = strlen(ellipsis);
             memmove(encoded + MAX_DISPLAY_DATA_SIZE - ellipsisLen, ellipsis, ellipsisLen);
         }
+        found_non_printable_chars = false;
         base64decode_result_t decode_result = base64decode(tx_context.data, encoded, ascii_len);
         if (!decode_result.is_valid) {
             return ERR_INVALID_MESSAGE;
         }
-        if (decode_result.has_nonPrintableChars) {
-            return_code = MSG_BLIND_SIGNING;
-        }
+        found_non_printable_chars = decode_result.has_nonPrintableChars;
         if (strncmp(tx_context.data, ESDT_TRANSFER_PREFIX, ESDT_TRANSFER_PREFIX_LENGTH) == 0) {
             extract_esdt_value(tx_hash_context.current_value, tx_hash_context.current_value_len);
         }
         compute_data_size(tx_hash_context.data_field_size);
         *valid = true;
     }
-    return return_code;
+    return MSG_OK;
 }
 
 static void extract_esdt_value(const char *encoded_data_field, const uint8_t encoded_data_length) {
@@ -434,7 +433,6 @@ uint16_t process_field(void) {
     }
     bool valid_field = false;
     uint16_t err;
-    uint16_t return_code = MSG_OK;
     err = verify_value(&valid_field);
     if (err != MSG_OK) {
         return err;
@@ -452,10 +450,8 @@ uint16_t process_field(void) {
         return err;
     }
     err = verify_data(&valid_field);
-    if (err != MSG_OK && err != MSG_BLIND_SIGNING) {
+    if (err != MSG_OK) {
         return err;
-    } else if (err == MSG_BLIND_SIGNING) {
-        return_code = MSG_BLIND_SIGNING;
     }
     err = verify_chainid(&valid_field);
     if (err != MSG_OK) {
@@ -489,7 +485,7 @@ uint16_t process_field(void) {
                            strlen(RECEIVER_USERNAME_FIELD)) == 0;
 
     if (valid_field) {
-        return return_code;
+        return MSG_OK;
     } else {
         return ERR_INVALID_MESSAGE;
     }
@@ -497,7 +493,6 @@ uint16_t process_field(void) {
 
 // parse_data interprets the json marshalized tx
 uint16_t parse_data(const uint8_t *data_buffer, uint16_t data_length) {
-    uint16_t return_code = MSG_OK;
     if ((data_length == 0) && (tx_hash_context.status == JSON_IDLE)) {
         return ERR_INVALID_MESSAGE;
     }
@@ -576,10 +571,8 @@ uint16_t parse_data(const uint8_t *data_buffer, uint16_t data_length) {
                         tx_hash_context.data_field_size = data_value_len;
                     }
                     uint16_t err = process_field();
-                    if (err != MSG_OK && err != MSG_BLIND_SIGNING) {
+                    if (err != MSG_OK) {
                         return err;
-                    } else if (is_data_field && err == MSG_BLIND_SIGNING) {
-                        return_code = MSG_BLIND_SIGNING;
                     }
                     tx_hash_context.status = JSON_EXPECTING_COMMA;
                     break;
@@ -598,15 +591,15 @@ uint16_t parse_data(const uint8_t *data_buffer, uint16_t data_length) {
                 if (c == '}') {
                     tx_hash_context.status = JSON_IDLE;
                     uint16_t err = process_field();
-                    if (err != MSG_OK && err != MSG_BLIND_SIGNING) {
+                    if (err != MSG_OK) {
                         return err;
                     } else {
-                        return return_code;
+                        return MSG_OK;
                     }
                 }
                 if (c == ',') {
                     uint16_t err = process_field();
-                    if (err != MSG_OK && err != MSG_BLIND_SIGNING) {
+                    if (err != MSG_OK) {
                         return err;
                     }
                     tx_hash_context.status = JSON_EXPECTING_FIELD;
@@ -620,7 +613,7 @@ uint16_t parse_data(const uint8_t *data_buffer, uint16_t data_length) {
             case JSON_EXPECTING_COMMA:
                 if (c == '}') {
                     tx_hash_context.status = JSON_IDLE;
-                    return return_code;
+                    return MSG_OK;
                 }
                 if (c != ',') {
                     return ERR_INVALID_MESSAGE;
@@ -629,7 +622,7 @@ uint16_t parse_data(const uint8_t *data_buffer, uint16_t data_length) {
                 break;
         }
     }
-    return return_code;
+    return MSG_OK;
 }
 
 // parse_esdt_data interprets the ESDT transfer data field of a transaction

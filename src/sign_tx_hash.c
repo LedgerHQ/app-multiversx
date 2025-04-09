@@ -18,7 +18,6 @@
 tx_hash_context_t tx_hash_context;
 tx_context_t tx_context;
 bool should_display_esdt_flow;
-bool should_display_blind_signing_flow;
 
 static uint8_t set_result_signature() {
     uint8_t tx = 0;
@@ -178,7 +177,7 @@ static void make_content_list(void) {
 
 static void ui_sign_tx_hash_nbgl(void) {
     make_content_list();
-    if (should_display_blind_signing_flow) {
+    if (found_non_printable_chars) {
         nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
                                        &content,
                                        &C_icon_multiversx_logo_64x64,
@@ -354,7 +353,7 @@ UX_STEP_NOCB(ux_warning_accept_blind_signing_step, pb, {&C_icon_warning, "Accept
 static void display_tx_sign_flow() {
     uint8_t step = 0;
 
-    if (should_display_blind_signing_flow) {
+    if (found_non_printable_chars) {
         tx_flow[step++] = &ux_warning_blind_signing_ahead_step;
     }
     tx_flow[step++] = &ux_sign_tx_hash_flow_17_step;
@@ -370,7 +369,7 @@ static void display_tx_sign_flow() {
         tx_flow[step++] = &ux_sign_tx_hash_flow_25_step;
     }
     tx_flow[step++] = &ux_sign_tx_hash_flow_21_step;
-    if (should_display_blind_signing_flow) {
+    if (found_non_printable_chars) {
         tx_flow[step++] = &ux_warning_accept_blind_signing_step;
     }
     tx_flow[step++] = &ux_sign_tx_hash_flow_22_step;
@@ -383,7 +382,7 @@ static void display_tx_sign_flow() {
 static void display_esdt_flow() {
     uint8_t step = 0;
 
-    if (should_display_blind_signing_flow) {
+    if (found_non_printable_chars) {
         tx_flow[step++] = &ux_warning_blind_signing_ahead_step;
     }
     esdt_flow[step++] = &ux_transfer_esdt_flow_24_step;
@@ -397,7 +396,7 @@ static void display_esdt_flow() {
         esdt_flow[step++] = &ux_transfer_esdt_flow_32_step;
     }
     esdt_flow[step++] = &ux_transfer_esdt_flow_28_step;
-    if (should_display_blind_signing_flow) {
+    if (found_non_printable_chars) {
         esdt_flow[step++] = &ux_warning_accept_blind_signing_step;
     }
     esdt_flow[step++] = &ux_transfer_esdt_flow_29_step;
@@ -453,10 +452,8 @@ void handle_sign_tx_hash(uint8_t p1,
         THROW(err);
     }
 
-    should_display_blind_signing_flow = false;
     uint16_t parse_err = parse_data(data_buffer, data_length);
-    should_display_blind_signing_flow = (parse_err == MSG_BLIND_SIGNING);
-    if (parse_err != MSG_OK && parse_err != MSG_BLIND_SIGNING) {
+    if (parse_err != MSG_OK) {
         init_tx_context();
         THROW(parse_err);
     }
@@ -484,13 +481,13 @@ void handle_sign_tx_hash(uint8_t p1,
     app_state = APP_STATE_IDLE;
 
 #if defined(TARGET_STAX) || defined(TARGET_FLEX)
-    if (should_display_blind_signing_flow && N_storage.setting_blind_signing == 0) {
+    if (found_non_printable_chars && N_storage.setting_blind_signing == 0) {
         disabled_blind_signing_warn();
     } else {
         ui_sign_tx_hash_nbgl();
     }
 #else
-    if (should_display_blind_signing_flow && N_storage.setting_blind_signing == 0) {
+    if (found_non_printable_chars && N_storage.setting_blind_signing == 0) {
         ux_flow_init(0, ux_error_blind_signing_disabled_flow, NULL);
     } else {
         if (should_display_esdt_flow) {

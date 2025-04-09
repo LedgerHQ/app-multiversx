@@ -8,7 +8,6 @@ typedef enum { CONTRACT_DATA_ENABLED = true, CONTRACT_DATA_DISABLED = false } co
 typedef enum { BLIND_SIGNING_ENABLED = true, BLIND_SIGNING_DISABLED = false } blind_signing_t;
 
 #define MSG_OK                     0x9000
-#define MSG_BLIND_SIGNING          0x9001
 #define ERR_USER_DENIED            0x6985
 #define ERR_UNKNOWN_INSTRUCTION    0x6D00  // unknown INS
 #define ERR_WRONG_CLA              0x6E00
