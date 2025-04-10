@@ -305,7 +305,7 @@ int compute_token_display(const char* received_origin,
     }
 
     // try to decode the base64 field
-    if (!base64decode(decoded_origin_buffer, encoded_origin, strlen(encoded_origin))) {
+    if (!base64decode(decoded_origin_buffer, encoded_origin, strlen(encoded_origin)).is_valid) {
         return AUTH_TOKEN_INVALID_RET_CODE;
     }
 

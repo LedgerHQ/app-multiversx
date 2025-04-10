@@ -5,6 +5,7 @@
 typedef enum { NETWORK_MAINNET = 0, NETWORK_TESTNET = 1 } network_t;
 
 typedef enum { CONTRACT_DATA_ENABLED = true, CONTRACT_DATA_DISABLED = false } contract_data_t;
+typedef enum { BLIND_SIGNING_ENABLED = true, BLIND_SIGNING_DISABLED = false } blind_signing_t;
 
 #define MSG_OK                     0x9000
 #define ERR_USER_DENIED            0x6985
