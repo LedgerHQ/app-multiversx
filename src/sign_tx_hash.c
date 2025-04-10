@@ -452,6 +452,7 @@ void handle_sign_tx_hash(uint8_t p1,
         THROW(err);
     }
 
+    found_non_printable_chars = false;
     uint16_t parse_err = parse_data(data_buffer, data_length);
     if (parse_err != MSG_OK) {
         init_tx_context();

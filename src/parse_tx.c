@@ -12,7 +12,7 @@
 #include "globals.h"
 #endif
 
-bool found_non_printable_chars = false;
+bool found_non_printable_chars;
 static void extract_esdt_value(const char *encoded_data_field, const uint8_t encoded_data_length);
 static void set_network(const char *chain_id);
 static void set_message_in_amount(const char *message);
@@ -248,7 +248,6 @@ uint16_t verify_data(bool *valid) {
             int ellipsisLen = strlen(ellipsis);
             memmove(encoded + MAX_DISPLAY_DATA_SIZE - ellipsisLen, ellipsis, ellipsisLen);
         }
-        found_non_printable_chars = false;
         base64decode_result_t decode_result = base64decode(tx_context.data, encoded, ascii_len);
         if (!decode_result.is_valid) {
             return ERR_INVALID_MESSAGE;
@@ -590,12 +589,7 @@ uint16_t parse_data(const uint8_t *data_buffer, uint16_t data_length) {
             case JSON_PROCESSING_NUMERIC_VALUE:
                 if (c == '}') {
                     tx_hash_context.status = JSON_IDLE;
-                    uint16_t err = process_field();
-                    if (err != MSG_OK) {
-                        return err;
-                    } else {
-                        return MSG_OK;
-                    }
+                    return process_field();
                 }
                 if (c == ',') {
                     uint16_t err = process_field();
