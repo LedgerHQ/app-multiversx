@@ -252,7 +252,7 @@ uint16_t verify_data(bool *valid) {
         if (!decode_result.is_valid) {
             return ERR_INVALID_MESSAGE;
         }
-        found_non_printable_chars = decode_result.has_nonPrintableChars;
+        found_non_printable_chars = decode_result.has_non_printable_chars;
         if (strncmp(tx_context.data, ESDT_TRANSFER_PREFIX, ESDT_TRANSFER_PREFIX_LENGTH) == 0) {
             extract_esdt_value(tx_hash_context.current_value, tx_hash_context.current_value_len);
         }
