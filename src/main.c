@@ -44,7 +44,6 @@
 #define OFFSET_LC    4
 #define OFFSET_CDATA 5
 
-unsigned char G_io_seproxyhal_spi_buffer[IO_SEPROXYHAL_BUFFER_SIZE_B];
 esdt_info_t esdt_info;
 
 #ifdef HAVE_BAGL
@@ -82,9 +81,9 @@ void handle_apdu(volatile unsigned int *flags, volatile unsigned int *tx) {
                     // still expect 6 bytes transmitted to maintain compatibility with the
                     // web wallet. Account index should be read from bytes 6->9, while
                     // address index should be read from bytes 10->13 (Big Endian)
-                    G_io_apdu_buffer[3] = LEDGER_MAJOR_VERSION;
-                    G_io_apdu_buffer[4] = LEDGER_MINOR_VERSION;
-                    G_io_apdu_buffer[5] = LEDGER_PATCH_VERSION;
+                    G_io_apdu_buffer[3] = MAJOR_VERSION;
+                    G_io_apdu_buffer[4] = MINOR_VERSION;
+                    G_io_apdu_buffer[5] = PATCH_VERSION;
 
                     G_io_apdu_buffer[6] = bip32_account >> 24;
                     G_io_apdu_buffer[7] = bip32_account >> 16;
