@@ -33,49 +33,47 @@ static uint8_t set_result_signature() {
 
 #if defined(TARGET_STAX) || defined(TARGET_FLEX)
 
-static nbgl_layoutTagValueList_t layout;
-static nbgl_layoutTagValue_t pairs_list[1];
 
-static const nbgl_pageInfoLongPress_t review_final_long_press = {
-    .text = "Sign message on\n" APPNAME " network?",
-    .icon = &C_icon_multiversx_logo_64x64,
-    .longPressText = "Hold to sign",
-    .longPressToken = 0,
-    .tuneId = TUNE_TAP_CASUAL,
-};
+static nbgl_contentTagValueList_t content;
+static nbgl_contentTagValue_t content_pairs_list[1];
 
 static void review_final_callback(bool confirmed) {
     if (confirmed) {
         int tx = set_result_signature();
         send_response(tx, true, false);
-        nbgl_useCaseStatus("MESSAGE\nSIGNED", true, ui_idle);
+        nbgl_useCaseStatus("Message\nsigned", true, ui_idle);
     } else {
-        nbgl_reject_message_choice();
+        send_response(0, false, false);
+        nbgl_useCaseStatus("Message\nrejected", false, ui_idle);
     }
 }
 
-static void start_review(void) {
-    layout.nbMaxLinesForValue = 0;
-    layout.smallCaseForValue = false;
-    layout.wrapping = true;
-    layout.pairs = pairs_list;
-    pairs_list[0].item = "hash";
-    pairs_list[0].value = msg_context.strhash;
-    layout.nbPairs = ARRAY_COUNT(pairs_list);
+static void make_content_list(void) {
+    uint8_t step = 0;
 
-    nbgl_useCaseStaticReview(&layout,
-                             &review_final_long_press,
-                             "Reject message",
-                             review_final_callback);
+    content_pairs_list[step].item = "Hash";
+    content_pairs_list[step++].value = msg_context.strhash;
+
+    content.pairs = content_pairs_list;
+    content.callback = NULL;
+    content.nbPairs = step;
+    content.startIndex = 0;
+    content.nbMaxLinesForValue = 2;
+    content.token = 0;
+    content.smallCaseForValue = false;
+    content.wrapping = true;
+    content.actionCallback = NULL;
 }
 
 static void ui_sign_message_nbgl(void) {
-    nbgl_useCaseReviewStart(&C_icon_multiversx_logo_64x64,
-                            "Review message to\nsign on " APPNAME "\nnetwork",
-                            "",
-                            "Reject message",
-                            start_review,
-                            nbgl_reject_message_choice);
+    make_content_list();
+    nbgl_useCaseReview(TYPE_MESSAGE,
+        &content,
+        &C_icon_multiversx_logo_64x64,
+        "Review message to\nsign on " APPNAME "\nnetwork",
+        "",
+        "Sign message on\n" APPNAME " network?",
+        review_final_callback);
 }
 
 #else

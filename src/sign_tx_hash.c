@@ -103,7 +103,7 @@ static void review_final_callback(bool confirmed) {
     if (confirmed) {
         int tx = set_result_signature();
         send_response(tx, true, false);
-        nbgl_useCaseStatus("TRANSACTION\nSIGNED", true, ui_idle);
+        nbgl_useCaseStatus("Transaction\nsigned", true, ui_idle);
     } else {
         send_response(0, false, false);
         nbgl_useCaseStatus("Transaction\nrejected", false, ui_idle);
