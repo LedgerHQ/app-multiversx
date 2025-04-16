@@ -33,7 +33,6 @@ static uint8_t set_result_signature() {
 
 #if defined(TARGET_STAX) || defined(TARGET_FLEX)
 
-
 static nbgl_contentTagValueList_t content;
 static nbgl_contentTagValue_t content_pairs_list[1];
 
