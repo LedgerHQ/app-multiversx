@@ -68,12 +68,12 @@ static void make_content_list(void) {
 static void ui_sign_message_nbgl(void) {
     make_content_list();
     nbgl_useCaseReview(TYPE_MESSAGE,
-        &content,
-        &C_icon_multiversx_logo_64x64,
-        "Review message to\nsign on " APPNAME "\nnetwork",
-        "",
-        "Sign message on\n" APPNAME " network?",
-        review_final_callback);
+                       &content,
+                       &C_icon_multiversx_logo_64x64,
+                       "Review message to\nsign on " APPNAME "\nnetwork",
+                       "",
+                       "Sign message on\n" APPNAME " network?",
+                       review_final_callback);
 }
 
 #else
