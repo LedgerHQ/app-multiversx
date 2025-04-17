@@ -218,6 +218,7 @@ void handle_sign_msg(uint8_t p1,
         memcpy(msg_context.message + msg_context.message_received_length,
                data_buffer,
                length_to_copy);
+    }
     msg_context.message_received_length += data_length;
 
     if (msg_context.message_received_length > MAX_DISPLAY_MESSAGE_SIZE) {
