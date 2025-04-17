@@ -57,12 +57,12 @@ typedef enum { BLIND_SIGNING_ENABLED = true, BLIND_SIGNING_DISABLED = false } bl
 #define MAX_ESDT_TRANSFER_DATA_SIZE 100
 #define MAX_DATA_SIZE               400  // 400 in base64 = 300 in ASCII
 #ifdef HAVE_BAGL
-#define MAX_DISPLAY_DATA_SIZE 64UL  // must be multiple of 4
+#define MAX_DISPLAY_DATA_SIZE    64UL  // must be multiple of 4
 #define MAX_DISPLAY_MESSAGE_SIZE 64UL  // must be multiple of 4
 #else
 // must be multiple of 4
 // must be <= MAX_VALUE_LEN
-#define MAX_DISPLAY_DATA_SIZE 128UL
+#define MAX_DISPLAY_DATA_SIZE    128UL
 #define MAX_DISPLAY_MESSAGE_SIZE 128UL
 #endif
 #define DATA_SIZE_LEN                      17
