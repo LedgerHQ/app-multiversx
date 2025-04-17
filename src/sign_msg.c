@@ -11,6 +11,8 @@ typedef struct {
     uint32_t len;
     uint8_t hash[HASH_LEN];
     char strhash[2 * HASH_LEN + 1];
+    char message[MAX_DISPLAY_MESSAGE_SIZE + 1];
+    uint16_t message_received_length;
     uint8_t signature[MESSAGE_SIGNATURE_LEN];
 } msg_context_t;
 
@@ -34,7 +36,7 @@ static uint8_t set_result_signature() {
 #if defined(TARGET_STAX) || defined(TARGET_FLEX)
 
 static nbgl_contentTagValueList_t content;
-static nbgl_contentTagValue_t content_pairs_list[1];
+static nbgl_contentTagValue_t content_pairs_list[2];
 
 static void review_final_callback(bool confirmed) {
     if (confirmed) {
@@ -52,6 +54,8 @@ static void make_content_list(void) {
 
     content_pairs_list[step].item = "Hash";
     content_pairs_list[step++].value = msg_context.strhash;
+    content_pairs_list[step].item = "Message";
+    content_pairs_list[step++].value = msg_context.message;
 
     content.pairs = content_pairs_list;
     content.callback = NULL;
@@ -84,14 +88,20 @@ UX_STEP_NOCB(ux_sign_msg_flow_14_step,
                  .title = "Hash",
                  .text = msg_context.strhash,
              });
-UX_STEP_VALID(ux_sign_msg_flow_15_step,
+UX_STEP_NOCB(ux_sign_msg_flow_15_step,
+             bnnn_paging,
+             {
+                 .title = "Message",
+                 .text = msg_context.message,
+             });
+UX_STEP_VALID(ux_sign_msg_flow_16_step,
               pb,
               send_response(set_result_signature(), true, true),
               {
                   &C_icon_validate_14,
                   "Sign message",
               });
-UX_STEP_VALID(ux_sign_msg_flow_16_step,
+UX_STEP_VALID(ux_sign_msg_flow_17_step,
               pb,
               send_response(0, false, true),
               {
@@ -102,7 +112,8 @@ UX_STEP_VALID(ux_sign_msg_flow_16_step,
 UX_FLOW(ux_sign_msg_flow,
         &ux_sign_msg_flow_14_step,
         &ux_sign_msg_flow_15_step,
-        &ux_sign_msg_flow_16_step);
+        &ux_sign_msg_flow_16_step,
+        &ux_sign_msg_flow_17_step);
 
 #endif
 
@@ -155,6 +166,10 @@ void handle_sign_msg(uint8_t p1,
         msg_context.len = U4BE(data_buffer, 0);
         data_buffer += 4;
         data_length -= 4;
+
+        msg_context.message_received_length = 0;
+        memset(msg_context.message, 0, sizeof(msg_context.message));
+
         // initialize hash with the constant string to prepend
         err = cx_keccak_init_no_throw(&sha3_context, SHA3_KECCAK_BITS);
         if (err != CX_OK) {
@@ -195,6 +210,18 @@ void handle_sign_msg(uint8_t p1,
     if (data_length > msg_context.len) {
         THROW(ERR_MESSAGE_TOO_LONG);
     }
+
+    // add the received message part to the message buffer
+    uint16_t to_copy = MIN(data_length, MAX_DISPLAY_MESSAGE_SIZE - msg_context.message_received_length);
+    if (to_copy > 0) {
+        memcpy(msg_context.message + msg_context.message_received_length, data_buffer, to_copy);
+    }
+    msg_context.message_received_length += data_length;
+
+    if (msg_context.message_received_length > MAX_DISPLAY_MESSAGE_SIZE) {
+        memcpy(msg_context.message + MAX_DISPLAY_MESSAGE_SIZE - 3, "...", 3);
+    }
+    msg_context.message[MAX_DISPLAY_MESSAGE_SIZE] = '\0';
 
     // add the received message part to the hash and decrease the remaining length
     err = cx_hash_no_throw((cx_hash_t *) &sha3_context, 0, data_buffer, data_length, NULL, 0);
