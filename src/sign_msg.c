@@ -234,6 +234,7 @@ void handle_sign_msg(uint8_t p1,
         data_buffer += 4;
         data_length -= 4;
 
+        found_non_printable_chars = false;
         msg_context.message_received_length = 0;
         memset(msg_context.message, 0, sizeof(msg_context.message));
 
