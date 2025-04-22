@@ -174,7 +174,7 @@ UX_FLOW(ux_blind_sign_msg_flow,
 
 static bool verify_message(char *decoded, size_t len) {
     bool has_non_printable_chars = false;
-    for (size_t i = 0; i < len / 4 * 3; i++) {
+    for (size_t i = 0; i < len; i++) {
         if ((decoded[i] > 0 && decoded[i] < 9) || (decoded[i] > 13 && decoded[i] < 32) ||
             decoded[i] > 126) {
             decoded[i] = '?';
