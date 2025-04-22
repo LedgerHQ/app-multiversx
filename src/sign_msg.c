@@ -82,12 +82,12 @@ static void ui_sign_message_nbgl(void) {
                                        review_final_callback);
     } else {
         nbgl_useCaseReview(TYPE_MESSAGE,
-                       &content,
-                       &C_icon_multiversx_logo_64x64,
-                       "Review message to\nsign on " APPNAME "\nnetwork",
-                       "",
-                       "Sign message on\n" APPNAME " network?",
-                       review_final_callback);
+                           &content,
+                           &C_icon_multiversx_logo_64x64,
+                           "Review message to\nsign on " APPNAME "\nnetwork",
+                           "",
+                           "Sign message on\n" APPNAME " network?",
+                           review_final_callback);
     }
 }
 
@@ -129,39 +129,38 @@ UX_FLOW(ux_sign_msg_flow,
 
 // UI for blind signing
 UX_STEP_CB(ux_warning_error_blind_signing_msg_1_step,
-    bnnn_paging,
-    ui_idle(),
-    {
-        "Blind signing disabled",
-        "Enable in Settings",
-    });
+           bnnn_paging,
+           ui_idle(),
+           {
+               "Blind signing disabled",
+               "Enable in Settings",
+           });
 
 UX_STEP_VALID(ux_warning_error_blind_signing_msg_2_step,
-       pb,
-       send_response(0, false, true),
-       {
-           &C_icon_crossmark,
-           "Back",
-       });
+              pb,
+              send_response(0, false, true),
+              {
+                  &C_icon_crossmark,
+                  "Back",
+              });
 
 UX_STEP_NOCB(ux_warning_blind_signing_msg_ahead_step,
-      pb,
-      {
-          &C_icon_warning,
-          "Blind signing",
-      });
+             pb,
+             {
+                 &C_icon_warning,
+                 "Blind signing",
+             });
 
 UX_STEP_NOCB(ux_warning_accept_blind_signing_msg_step, 
-      pb, 
-      {
-          &C_icon_warning, 
-          "Accept risk and",
-      });
+             pb, 
+             {
+                 &C_icon_warning, 
+                 "Accept risk and",
+             });
 
 UX_FLOW(ux_error_blind_signing_disabled_msg_flow,
         &ux_warning_error_blind_signing_msg_1_step,
         &ux_warning_error_blind_signing_msg_2_step);
-
 
 UX_FLOW(ux_blind_sign_msg_flow,
         &ux_warning_blind_signing_msg_ahead_step,
@@ -286,8 +285,9 @@ void handle_sign_msg(uint8_t p1,
         memcpy(msg_context.message + msg_context.message_received_length,
                data_buffer,
                length_to_copy);
-        
-        bool result = verify_message(msg_context.message + msg_context.message_received_length, length_to_copy);
+
+        bool result = verify_message(msg_context.message + msg_context.message_received_length,
+                                     length_to_copy);
         if (result) {
             found_non_printable_chars = true;
         }
@@ -295,7 +295,7 @@ void handle_sign_msg(uint8_t p1,
     msg_context.message_received_length += data_length;
 
     if (msg_context.message_received_length > MAX_DISPLAY_MESSAGE_SIZE) {
-        char ellipsis[3] = "...";  
+        char ellipsis[3] = "...";
         int ellipsisLen = strlen(ellipsis);
         memcpy(msg_context.message + MAX_DISPLAY_MESSAGE_SIZE - ellipsisLen, ellipsis, ellipsisLen);
     }
@@ -345,7 +345,11 @@ void handle_sign_msg(uint8_t p1,
     if (found_non_printable_chars && N_storage.setting_blind_signing == 0) {
         ux_flow_init(0, ux_error_blind_signing_disabled_msg_flow, NULL);
     } else {
-        ux_flow_init(0, ux_sign_msg_flow, NULL);
+        if (found_non_printable_chars) {
+            ux_flow_init(0, ux_blind_sign_msg_flow, NULL);
+        } else {
+            ux_flow_init(0, ux_sign_msg_flow, NULL);
+        }
     }
 #endif
     *flags |= IO_ASYNCH_REPLY;

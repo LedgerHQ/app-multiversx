@@ -434,7 +434,7 @@ class TestSignMsg:
             if backend.firmware.device.startswith("nano"):
                 navigator.navigate_until_text_and_compare(NavInsID.RIGHT_CLICK,
                                                           [NavInsID.BOTH_CLICK],
-                                                          "Reject",
+                                                          "Sign message",
                                                           ROOT_SCREENSHOT_PATH,
                                                           test_name)
             elif backend.firmware.device in ["stax", "flex"]:
