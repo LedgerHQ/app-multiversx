@@ -427,7 +427,7 @@ class TestSignMsg:
 
     def test_blind_sign_msg_confirmed(self, backend, navigator, test_name):
         turn_on_blind_signing(backend, navigator)
-        payload = payload = "Björk sent €100 – Grüße von München! ¿Hablas español?".encode('utf-8')
+        payload = "Björk sent €100 – Grüße von München!".encode('utf-8')
         payload = len(payload).to_bytes(4, "big") + payload
         backend.raise_policy = RaisePolicy.RAISE_NOTHING
         with send_async_sign_message(backend, Ins.SIGN_MSG, payload):

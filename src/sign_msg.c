@@ -151,10 +151,10 @@ UX_STEP_NOCB(ux_warning_blind_signing_msg_ahead_step,
                  "Blind signing",
              });
 
-UX_STEP_NOCB(ux_warning_accept_blind_signing_msg_step, 
-             pb, 
+UX_STEP_NOCB(ux_warning_accept_blind_signing_msg_step,
+             pb,
              {
-                 &C_icon_warning, 
+                 &C_icon_warning,
                  "Accept risk and",
              });
 
