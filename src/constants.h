@@ -93,7 +93,8 @@ typedef enum { BLIND_SIGNING_ENABLED = true, BLIND_SIGNING_DISABLED = false } bl
 #define SHA3_KECCAK_BITS                   256
 #define PUBLIC_KEY_LEN                     32
 #define BASE_10                            10
-#define TX_SIGN_FLOW_SIZE                  10
+#define TX_SIGN_FLOW_SIZE                  15
+#define MSG_SIGN_FLOW_SIZE                 10
 #define ESDT_TRANSFER_FLOW_SIZE            10
 #define BASE_64_INVALID_CHAR               '?'
 #define SC_ARGS_SEPARATOR                  '@'

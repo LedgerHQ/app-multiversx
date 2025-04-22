@@ -2,6 +2,7 @@
 #include "get_private_key.h"
 #include "utils.h"
 #include "menu.h"
+#include "parse_tx.h"
 
 #ifdef HAVE_NBGL
 #include "nbgl_use_case.h"
@@ -70,13 +71,24 @@ static void make_content_list(void) {
 
 static void ui_sign_message_nbgl(void) {
     make_content_list();
-    nbgl_useCaseReview(TYPE_MESSAGE,
+    if (found_non_printable_chars) {
+        nbgl_useCaseReviewBlindSigning(TYPE_MESSAGE,
+                                       &content,
+                                       &C_icon_multiversx_logo_64x64,
+                                       "Review message to\nsign on " APPNAME "\nnetwork",
+                                       "",
+                                       "Accept risk and sign transaction?",
+                                       NULL,
+                                       review_final_callback);
+    } else {
+        nbgl_useCaseReview(TYPE_MESSAGE,
                        &content,
                        &C_icon_multiversx_logo_64x64,
                        "Review message to\nsign on " APPNAME "\nnetwork",
                        "",
                        "Sign message on\n" APPNAME " network?",
                        review_final_callback);
+    }
 }
 
 #else
@@ -115,7 +127,63 @@ UX_FLOW(ux_sign_msg_flow,
         &ux_sign_msg_flow_16_step,
         &ux_sign_msg_flow_17_step);
 
+// UI for blind signing
+UX_STEP_CB(ux_warning_error_blind_signing_msg_1_step,
+    bnnn_paging,
+    ui_idle(),
+    {
+        "Blind signing disabled",
+        "Enable in Settings",
+    });
+
+UX_STEP_VALID(ux_warning_error_blind_signing_msg_2_step,
+       pb,
+       send_response(0, false, true),
+       {
+           &C_icon_crossmark,
+           "Back",
+       });
+
+UX_STEP_NOCB(ux_warning_blind_signing_msg_ahead_step,
+      pb,
+      {
+          &C_icon_warning,
+          "Blind signing",
+      });
+
+UX_STEP_NOCB(ux_warning_accept_blind_signing_msg_step, 
+      pb, 
+      {
+          &C_icon_warning, 
+          "Accept risk and",
+      });
+
+UX_FLOW(ux_error_blind_signing_disabled_msg_flow,
+        &ux_warning_error_blind_signing_msg_1_step,
+        &ux_warning_error_blind_signing_msg_2_step);
+
+
+UX_FLOW(ux_blind_sign_msg_flow,
+        &ux_warning_blind_signing_msg_ahead_step,
+        &ux_sign_msg_flow_14_step,
+        &ux_sign_msg_flow_15_step,
+        &ux_warning_accept_blind_signing_msg_step,
+        &ux_sign_msg_flow_16_step,
+        &ux_sign_msg_flow_17_step);
+
 #endif
+
+static bool verify_message(char *decoded, size_t len) {
+    bool has_non_printable_chars = false;
+    for (size_t i = 0; i < len / 4 * 3; i++) {
+        if ((decoded[i] > 0 && decoded[i] < 9) || (decoded[i] > 13 && decoded[i] < 32) ||
+            decoded[i] > 126) {
+            decoded[i] = '?';
+            has_non_printable_chars = true;
+        }
+    }
+    return has_non_printable_chars;
+}
 
 static bool sign_message(void) {
     cx_ecfp_private_key_t private_key;
@@ -218,11 +286,18 @@ void handle_sign_msg(uint8_t p1,
         memcpy(msg_context.message + msg_context.message_received_length,
                data_buffer,
                length_to_copy);
+        
+        bool result = verify_message(msg_context.message + msg_context.message_received_length, length_to_copy);
+        if (result) {
+            found_non_printable_chars = true;
+        }
     }
     msg_context.message_received_length += data_length;
 
     if (msg_context.message_received_length > MAX_DISPLAY_MESSAGE_SIZE) {
-        memcpy(msg_context.message + MAX_DISPLAY_MESSAGE_SIZE - 3, "...", 3);
+        char ellipsis[3] = "...";  
+        int ellipsisLen = strlen(ellipsis);
+        memcpy(msg_context.message + MAX_DISPLAY_MESSAGE_SIZE - ellipsisLen, ellipsis, ellipsisLen);
     }
     msg_context.message[MAX_DISPLAY_MESSAGE_SIZE] = '\0';
 
@@ -261,9 +336,17 @@ void handle_sign_msg(uint8_t p1,
     app_state = APP_STATE_IDLE;
 
 #if defined(TARGET_STAX) || defined(TARGET_FLEX)
-    ui_sign_message_nbgl();
+    if (found_non_printable_chars && N_storage.setting_blind_signing == 0) {
+        disabled_blind_signing_warn();
+    } else {
+        ui_sign_message_nbgl();
+    }
 #else
-    ux_flow_init(0, ux_sign_msg_flow, NULL);
+    if (found_non_printable_chars && N_storage.setting_blind_signing == 0) {
+        ux_flow_init(0, ux_error_blind_signing_disabled_msg_flow, NULL);
+    } else {
+        ux_flow_init(0, ux_sign_msg_flow, NULL);
+    }
 #endif
     *flags |= IO_ASYNCH_REPLY;
 }
