@@ -172,12 +172,12 @@ UX_FLOW(ux_blind_sign_msg_flow,
 
 #endif
 
-static bool verify_message(char *decoded, size_t len) {
+static bool verify_message(char *message, size_t len) {
     bool has_non_printable_chars = false;
     for (size_t i = 0; i < len; i++) {
-        if ((decoded[i] > 0 && decoded[i] < 9) || (decoded[i] > 13 && decoded[i] < 32) ||
-            decoded[i] > 126) {
-            decoded[i] = '?';
+        if ((message[i] > 0 && message[i] < 9) || (message[i] > 13 && message[i] < 32) ||
+            message[i] > 126) {
+            message[i] = '?';
             has_non_printable_chars = true;
         }
     }
