@@ -77,7 +77,7 @@ static void ui_sign_message_nbgl(void) {
                                        &C_icon_multiversx_logo_64x64,
                                        "Review message to\nsign on " APPNAME "\nnetwork",
                                        "",
-                                       "Accept risk and sign transaction?",
+                                       "Accept risk and sign message?",
                                        NULL,
                                        review_final_callback);
     } else {
@@ -338,7 +338,7 @@ void handle_sign_msg(uint8_t p1,
 
 #if defined(TARGET_STAX) || defined(TARGET_FLEX)
     if (found_non_printable_chars && N_storage.setting_blind_signing == 0) {
-        disabled_blind_signing_warn();
+        disabled_blind_signing_msg_warn();
     } else {
         ui_sign_message_nbgl();
     }

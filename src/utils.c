@@ -373,7 +373,7 @@ void nbgl_reject_transaction_choice(void) {
                         transaction_rejection);
 }
 
-static void disabled_blind_signing_choice(bool confirm) {
+static void disabled_blind_signing_tx_choice(bool confirm) {
     send_response(0, false, false);
     if (confirm) {
         ui_settings();
@@ -382,13 +382,31 @@ static void disabled_blind_signing_choice(bool confirm) {
     }
 }
 
-void disabled_blind_signing_warn(void) {
+static void disabled_blind_signing_msg_choice(bool confirm) {
+    send_response(0, false, false);
+    if (confirm) {
+        ui_settings();
+    } else {
+        nbgl_useCaseStatus("Message\nrejected", false, ui_idle);
+    }
+}
+
+void disabled_blind_signing_tx_warn(void) {
     nbgl_useCaseChoice(NULL,
                        "This transaction cannot be clear-signed",
                        "Enable blind signing in the settings to sign this transaction.",
                        "Go to settings",
                        "Reject transaction",
-                       disabled_blind_signing_choice);
+                       disabled_blind_signing_tx_choice);
+}
+
+void disabled_blind_signing_msg_warn(void) {
+    nbgl_useCaseChoice(NULL,
+                       "This message cannot be clear-signed",
+                       "Enable blind signing in the settings to sign this message.",
+                       "Go to settings",
+                       "Reject message",
+                       disabled_blind_signing_msg_choice);
 }
 
 #endif

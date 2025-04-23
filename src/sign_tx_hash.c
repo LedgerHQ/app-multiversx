@@ -465,7 +465,7 @@ void handle_sign_tx_hash(uint8_t p1,
 
 #if defined(TARGET_STAX) || defined(TARGET_FLEX)
     if (found_non_printable_chars && N_storage.setting_blind_signing == 0) {
-        disabled_blind_signing_warn();
+        disabled_blind_signing_tx_warn();
     } else {
         ui_sign_tx_hash_nbgl();
     }
