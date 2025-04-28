@@ -189,10 +189,10 @@ static void process_message(uint8_t *message, size_t data_length) {
     uint16_t length_to_copy =
         MIN(data_length, MAX_DISPLAY_MESSAGE_SIZE - msg_context.message_received_length);
     if (length_to_copy > 0) {
-         memcpy(msg_context.message + msg_context.message_received_length, message, length_to_copy);
+        memcpy(msg_context.message + msg_context.message_received_length, message, length_to_copy);         
 
         bool result = verify_message(msg_context.message + msg_context.message_received_length,
-                                    length_to_copy);
+                                     length_to_copy);
         if (result) {
             found_non_printable_chars = true;
         }
