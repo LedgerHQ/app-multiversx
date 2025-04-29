@@ -185,7 +185,6 @@ static bool verify_message(char *message, size_t len) {
 }
 
 static void process_message(uint8_t *message, size_t data_length) {
-    PRINTF(message, data_length);
     uint16_t length_to_copy =
         MIN(data_length, MAX_DISPLAY_MESSAGE_SIZE - msg_context.message_received_length);
     if (length_to_copy > 0) {
