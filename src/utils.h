@@ -29,5 +29,7 @@ void convert_to_hex_str(char* destination,
 
 void nbgl_reject_message_choice(void);
 void nbgl_reject_transaction_choice(void);
+void disabled_blind_signing_tx_warn(void);
+void disabled_blind_signing_msg_warn(void);
 
 #endif

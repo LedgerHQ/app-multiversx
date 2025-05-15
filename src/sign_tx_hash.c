@@ -103,29 +103,11 @@ static void review_final_callback(bool confirmed) {
     if (confirmed) {
         int tx = set_result_signature();
         send_response(tx, true, false);
-        nbgl_useCaseStatus("TRANSACTION\nSIGNED", true, ui_idle);
+        nbgl_useCaseStatus("Transaction\nsigned", true, ui_idle);
     } else {
         send_response(0, false, false);
         nbgl_useCaseStatus("Transaction\nrejected", false, ui_idle);
     }
-}
-
-static void disabled_blind_signing_choice(bool confirm) {
-    send_response(0, false, false);
-    if (confirm) {
-        ui_settings();
-    } else {
-        nbgl_useCaseStatus("Transaction\nrejected", false, ui_idle);
-    }
-}
-
-void disabled_blind_signing_warn(void) {
-    nbgl_useCaseChoice(NULL,
-                       "This transaction cannot be clear-signed",
-                       "Enable blind signing in the settings to sign this transaction.",
-                       "Go to settings",
-                       "Reject transaction",
-                       disabled_blind_signing_choice);
 }
 
 static void update_pair(nbgl_contentTagValue_t *pair, const char *item, const char *value) {
@@ -483,7 +465,7 @@ void handle_sign_tx_hash(uint8_t p1,
 
 #if defined(TARGET_STAX) || defined(TARGET_FLEX)
     if (found_non_printable_chars && N_storage.setting_blind_signing == 0) {
-        disabled_blind_signing_warn();
+        disabled_blind_signing_tx_warn();
     } else {
         ui_sign_tx_hash_nbgl();
     }
