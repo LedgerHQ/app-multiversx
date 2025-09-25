@@ -42,14 +42,14 @@ static uint8_t set_result_auth_token(void) {
     return tx;
 }
 
-#if defined(TARGET_STAX) || defined(TARGET_FLEX)
+#ifdef HAVE_NBGL
 
 static nbgl_layoutTagValueList_t layout;
 static nbgl_layoutTagValue_t pairs_list[2];
 
 static const nbgl_pageInfoLongPress_t review_final_long_press = {
     .text = "Sign message on\n" APPNAME " network?",
-    .icon = &C_icon_multiversx_logo_64x64,
+    .icon = &ICON_APP_HOME,
     .longPressText = "Hold to sign",
     .longPressToken = 0,
     .tuneId = TUNE_TAP_CASUAL,
@@ -83,7 +83,7 @@ static void start_review(void) {
 }
 
 static void ui_sign_message_auth_token_nbgl(void) {
-    nbgl_useCaseReviewStart(&C_icon_multiversx_logo_64x64,
+    nbgl_useCaseReviewStart(&ICON_APP_HOME,
                             "Review auth token to\nsign on " APPNAME "\nnetwork",
                             "",
                             "Reject message",
@@ -428,7 +428,7 @@ void handle_auth_token(uint8_t p1,
 
     app_state = APP_STATE_IDLE;
 
-#if defined(TARGET_STAX) || defined(TARGET_FLEX)
+#ifdef HAVE_NBGL
     ui_sign_message_auth_token_nbgl();
 #else
     ux_flow_init(0, ux_auth_token_msg_flow, NULL);

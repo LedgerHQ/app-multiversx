@@ -7,10 +7,10 @@
 #include "nbgl_use_case.h"
 #endif
 
-#if defined(TARGET_STAX) || defined(TARGET_FLEX)
+#ifdef HAVE_NBGL
 
 static const char* const info_types[] = {"Version", APPNAME};
-static const char* const info_contents[] = {APPVERSION, "(c) 2023 Ledger"};
+static const char* const info_contents[] = {APPVERSION, "(c) 2025 Ledger"};
 
 static void quit_app_callback(void) {
     os_sched_exit(-1);
@@ -99,7 +99,7 @@ static void ui_menu_main(int page) {
     initialize_settings_contents();
 
     nbgl_useCaseHomeAndSettings(APPNAME,
-                                &C_icon_multiversx_logo_64x64,
+                                &ICON_APP_HOME,
                                 NULL,
                                 page,
                                 &settings_contents,
@@ -265,7 +265,7 @@ static void info_submenu_selector(unsigned int idx) {
 #endif
 
 void ui_idle(void) {
-#if defined(TARGET_STAX) || defined(TARGET_FLEX)
+#ifdef HAVE_NBGL
     ui_menu_main(INIT_HOME_PAGE);
 #else
     // reserve a display stack slot if none yet
@@ -277,7 +277,7 @@ void ui_idle(void) {
 }
 
 void ui_settings(void) {
-#if defined(TARGET_STAX) || defined(TARGET_FLEX)
+#ifdef HAVE_NBGL
     const int BLIND_SIGNING_SWITCH_SETTINGS_PAGE = 0;
     ui_menu_main(BLIND_SIGNING_SWITCH_SETTINGS_PAGE);
 #else
