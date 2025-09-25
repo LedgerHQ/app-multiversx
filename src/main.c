@@ -293,18 +293,7 @@ unsigned char io_event(unsigned char channel) {
             break;
 
         case SEPROXYHAL_TAG_TICKER_EVENT:
-            UX_TICKER_EVENT(G_io_seproxyhal_spi_buffer, {
-#if defined(TARGET_NANOS)
-                if (UX_ALLOWED) {
-                    if (ux_step_count) {
-                        // prepare next screen
-                        ux_step = (ux_step + 1) % ux_step_count;
-                        // redisplay screen
-                        UX_REDISPLAY();
-                    }
-                }
-#endif  // TARGET_NANOX
-            });
+            UX_TICKER_EVENT(G_io_seproxyhal_spi_buffer, {});
             break;
         default:
             UX_DEFAULT_EVENT();

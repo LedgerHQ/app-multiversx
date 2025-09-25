@@ -4,8 +4,7 @@
 #include "utils.h"
 #include "ux.h"
 
-// Not applicatble for Stax
-#if !defined(TARGET_STAX) && !defined(TARGET_FLEX)
+#ifndef HAVE_NBGL
 
 static unsigned int app_version_ui_button(unsigned int button_mask,
                                           unsigned int button_mask_counter);

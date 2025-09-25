@@ -19,6 +19,8 @@ ifeq ($(BOLOS_SDK),)
 $(error Environment variable BOLOS_SDK is not set)
 endif
 
+include $(BOLOS_SDK)/Makefile.target
+
 APP_LOAD_PARAMS = --curve ed25519
 APP_LOAD_PARAMS += --path "44'/508'"
 APP_LOAD_PARAMS += $(COMMON_LOAD_PARAMS)
@@ -28,7 +30,7 @@ VARIANT_VALUES = eGLD
 
 APPNAME      = "MultiversX"
 APPVERSION_M = 1
-APPVERSION_N = 2
+APPVERSION_N = 3
 APPVERSION_P = 0
 APPVERSION   = $(APPVERSION_M).$(APPVERSION_N).$(APPVERSION_P)
 
@@ -42,6 +44,7 @@ ICON_STAX = icons/stax_app_multiversx.gif
 ICON_FLEX = icons/flex_app_multiversx.gif
 ICON_NANOX = icons/nanox_app_multiversx.gif
 ICON_NANOSP = icons/nanosp_app_multiversx.gif
+ICON_APEX_P = icons/apex_app_multiversx.png
 
 ########################################
 # App communication interfaces         #

@@ -34,7 +34,7 @@ static uint8_t set_result_signature() {
     return tx;
 }
 
-#if defined(TARGET_STAX) || defined(TARGET_FLEX)
+#ifdef HAVE_NBGL
 
 static nbgl_contentTagValueList_t content;
 static nbgl_contentTagValue_t content_pairs_list[2];
@@ -74,7 +74,7 @@ static void ui_sign_message_nbgl(void) {
     if (found_non_printable_chars) {
         nbgl_useCaseReviewBlindSigning(TYPE_MESSAGE,
                                        &content,
-                                       &C_icon_multiversx_logo_64x64,
+                                       &ICON_APP_HOME,
                                        "Review message to\nsign on " APPNAME "\nnetwork",
                                        "",
                                        "Accept risk and sign message?",
@@ -83,7 +83,7 @@ static void ui_sign_message_nbgl(void) {
     } else {
         nbgl_useCaseReview(TYPE_MESSAGE,
                            &content,
-                           &C_icon_multiversx_logo_64x64,
+                           &ICON_APP_HOME,
                            "Review message to\nsign on " APPNAME "\nnetwork",
                            "",
                            "Sign message on\n" APPNAME " network?",
@@ -338,7 +338,7 @@ void handle_sign_msg(uint8_t p1,
 
     app_state = APP_STATE_IDLE;
 
-#if defined(TARGET_STAX) || defined(TARGET_FLEX)
+#ifdef HAVE_NBGL
     if (found_non_printable_chars && N_storage.setting_blind_signing == 0) {
         disabled_blind_signing_msg_warn();
     } else {
