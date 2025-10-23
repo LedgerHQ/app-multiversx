@@ -95,6 +95,7 @@ If you want to check the build process for a specific device:
 - Nano X `make clean && BOLOS_SDK=$NANOX_SDK make load`
 - Stax: `make clean && BOLOS_SDK=$STAX_SDK make load`
 - Flex: `make clean && BOLOS_SDK=$FLEX_SDK make load`
+- Apex P: `make clean && BOLOS_SDK=$APEX_P_SDK make load`
 
 Reference: https://github.com/LedgerHQ/ledger-app-builder
 
